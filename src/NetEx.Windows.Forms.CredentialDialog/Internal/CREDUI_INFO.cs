@@ -1,12 +1,13 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
-namespace System.Windows.Forms.Internal
+namespace NetEx.Windows.Forms.Internal
 {
     /// <summary>
     /// The CREDUI_INFO structure is used to pass information to the CredUIPromptForCredentials function that creates a dialog box used to obtain credentials information.
     /// </summary>
-    /// <seealso href="https://docs.microsoft.com/en-gb/windows/desktop/api/wincred/ns-wincred-_credui_infow"/>
+    /// <seealso href="https://docs.microsoft.com/en-gb/windows/desktop/api/wincred/ns-wincred-credui_infow"/>
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     internal struct CREDUI_INFO

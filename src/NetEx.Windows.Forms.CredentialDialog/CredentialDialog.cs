@@ -1,4 +1,6 @@
-﻿using System.ComponentModel;
+﻿using NetEx.Windows.Forms.Internal;
+using System;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Runtime.InteropServices;
@@ -6,9 +8,9 @@ using System.Security;
 using System.Security.Permissions;
 using System.Text;
 using System.Threading;
-using System.Windows.Forms.Internal;
+using System.Windows.Forms;
 
-namespace System.Windows.Forms
+namespace NetEx.Windows.Forms
 {
     /// <summary>
     /// Displays a standard dialog box that prompts the user to enter credentials. This class cannot be inherited.
@@ -47,7 +49,7 @@ namespace System.Windows.Forms
         private string _domain;
         private Image _image;
         private string _message;
-        private SecureString _password = new SecureString();
+        private SecureString _password;
         private bool _saveChecked;
         private string _title;
         private string _username;
@@ -59,8 +61,12 @@ namespace System.Windows.Forms
         /// <summary>
         /// Initializes a new instance of the <see cref="CredentialDialog" /> class.
         /// </summary>
-        [SuppressMessage("ReSharper", "InheritdocConsiderUsage")]
-        public CredentialDialog() => Reset();
+        public CredentialDialog()
+        {
+            _password = new SecureString();
+
+            Reset();
+        }
 
         #endregion
 
@@ -124,7 +130,7 @@ namespace System.Windows.Forms
         /// <summary>
         /// Gets or sets the image that is displayed in the dialog box when running on Windows XP and Windows Server 2003, or when <see cref="AutoUpgradeEnabled"/> is set to false.
         /// </summary>
-        /// <value>The <see cref="Drawing.Image"/> to display.</value>
+        /// <value>The <see cref="System.Drawing.Image"/> to display.</value>
         /// <remarks>
         /// If this member is NULL, a default bitmap is used. The bitmap size is limited to 320x60 pixels.
         /// <para>This property is only applicable on Windows XP and Windows Server 2003, or on later versions of Windows when using the dialog box with <see cref="AutoUpgradeEnabled"/> set to false.</para>
@@ -171,15 +177,16 @@ namespace System.Windows.Forms
         [Category("Appearance")]
         [DefaultValue("")]
         [Description("The text to display in the dialog.")]
-        [SuppressMessage("ReSharper", "UnusedMember.Global")]
+        //[SuppressMessage("ReSharper", "UnusedMember.Global")]
         public string Message
         {
             get => _message;
             set
             {
-                if (value != null)
-                    if (value.Length > CREDUI_MAX_MESSAGE_LENGTH)
-                        throw new ArgumentException($"The message has a maximum length of {CREDUI_MAX_MESSAGE_LENGTH} characters.", nameof(value));
+                if (value is { Length: > CREDUI_MAX_MESSAGE_LENGTH })
+                {
+                    throw new ArgumentException($"The message has a maximum length of {CREDUI_MAX_MESSAGE_LENGTH} characters.", nameof(value));
+                }
 
                 _message = value;
             }
@@ -212,10 +219,10 @@ namespace System.Windows.Forms
         /// Gets a <see cref="String"/> containing the password entered in the dialog box.
         /// </summary>
         /// <value>The value of <see cref="Password"/> converted to a <see cref="String"/>.</value>
-        /// <remarks>This method is provided for debugging purposes only and is only included in debug builds.</remarks>
+        /// <remarks>This method is provided for debugging purposes only, and is only included in debug builds.</remarks>
         [Category("Data")]
         [Description("The password entered in the dialog box.")]
-        [SuppressMessage("Microsoft.Security", "CA2122:DoNotIndirectlyExposeMethodsWithLinkDemands")]
+        //[SuppressMessage("Microsoft.Security", "CA2122:DoNotIndirectlyExposeMethodsWithLinkDemands")]
         public string PasswordString
         {
             get
@@ -268,7 +275,7 @@ namespace System.Windows.Forms
         [Category("Appearance")]
         [DefaultValue("")]
         [Description("The string to display in the title bar of the dialog box.")]
-        [SuppressMessage("ReSharper", "UnusedMember.Global")]
+        //[SuppressMessage("ReSharper", "UnusedMember.Global")]
         public string Title
         {
             get => _title;

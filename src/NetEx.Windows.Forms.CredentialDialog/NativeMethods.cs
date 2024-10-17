@@ -1,8 +1,9 @@
-﻿using System.Runtime.InteropServices;
+﻿using NetEx.Windows.Forms.Internal;
+using System;
+using System.Runtime.InteropServices;
 using System.Text;
-using System.Windows.Forms.Internal;
 
-namespace System.Windows.Forms
+namespace NetEx.Windows.Forms
 {
     internal static class NativeMethods
     {

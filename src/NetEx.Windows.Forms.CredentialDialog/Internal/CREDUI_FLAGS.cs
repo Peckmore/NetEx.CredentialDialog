@@ -1,6 +1,7 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 
-namespace System.Windows.Forms.Internal
+namespace NetEx.Windows.Forms.Internal
 {
     /// <summary>
     /// Flags that control the operation of a credential dialog box called using CredUIPromptForCredentials.
@@ -9,6 +10,8 @@ namespace System.Windows.Forms.Internal
     [Flags]
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
+    // ReSharper disable CommentTypo
+    // ReSharper disable IdentifierTypo
     internal enum CREDUI_FLAGS
     {
         /// <summary>
@@ -80,4 +83,6 @@ namespace System.Windows.Forms.Internal
         /// </summary>
         CREDUI_FLAGS_VALIDATE_USERNAME = 0x00400,
     }
+    // ReSharper restore CommentTypo
+    // ReSharper restore IdentifierTypo
 }

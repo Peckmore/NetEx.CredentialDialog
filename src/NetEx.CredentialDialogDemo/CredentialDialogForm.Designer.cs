@@ -1,6 +1,4 @@
-﻿using System.Windows.Forms;
-
-namespace NetExDemo.CredentialDialog
+﻿namespace NetEx.CredentialDialogDemo
 {
     partial class CredentialDialogForm
     {
@@ -32,7 +30,7 @@ namespace NetExDemo.CredentialDialog
         {
             this.promptButton = new System.Windows.Forms.Button();
             this.credentialDialogPropertyGrid = new System.Windows.Forms.PropertyGrid();
-            this.credentialDialog = new System.Windows.Forms.CredentialDialog();
+            this.credentialDialog = new NetEx.Windows.Forms.CredentialDialog();
             this.SuspendLayout();
             // 
             // promptButton
@@ -73,7 +71,6 @@ namespace NetExDemo.CredentialDialog
 
         private Button promptButton;
         private PropertyGrid credentialDialogPropertyGrid;
-        private System.Windows.Forms.CredentialDialog credentialDialog;
+        private NetEx.Windows.Forms.CredentialDialog credentialDialog;
     }
 }
-
