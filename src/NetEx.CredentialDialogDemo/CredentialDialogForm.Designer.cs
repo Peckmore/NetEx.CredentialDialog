@@ -48,6 +48,7 @@ namespace NetEx.CredentialDialogDemo
             this.showDialogButton.TabIndex = 2;
             this.showDialogButton.Text = "Show Dialog";
             this.showDialogButton.UseVisualStyleBackColor = true;
+            this.showDialogButton.Click += new System.EventHandler(this.showDialogButton_Click);
             // 
             // credentialDialogPropertyGrid
             // 
