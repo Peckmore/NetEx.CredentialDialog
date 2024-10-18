@@ -9,6 +9,7 @@ namespace NetEx.Windows.Forms.Internal
     /// </summary>
     /// <seealso href="https://docs.microsoft.com/en-gb/windows/desktop/api/wincred/ns-wincred-credui_infow"/>
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    [SuppressMessage("ReSharper", "IdentifierTypo")]
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     internal struct CREDUI_INFO
     {

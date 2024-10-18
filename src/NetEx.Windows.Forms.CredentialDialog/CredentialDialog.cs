@@ -5,10 +5,13 @@ using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Security;
-using System.Security.Permissions;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+
+#if NETFRAMEWORK
+using System.Security.Permissions;
+#endif
 
 namespace NetEx.Windows.Forms
 {
@@ -47,9 +50,9 @@ namespace NetEx.Windows.Forms
         #region Fields
 
         private string _domain;
-        private Image _image;
+        private Image? _image;
         private string _message;
-        private SecureString _password;
+        private SecureString? _password;
         private bool _saveChecked;
         private string _title;
         private string _username;
@@ -63,7 +66,10 @@ namespace NetEx.Windows.Forms
         /// </summary>
         public CredentialDialog()
         {
-            _password = new SecureString();
+            _domain = string.Empty;
+            _message = string.Empty;
+            _title = string.Empty;
+            _username = string.Empty;
 
             Reset();
         }
@@ -73,7 +79,7 @@ namespace NetEx.Windows.Forms
         #region Properties
 
         /// <summary>
-        /// Gets or sets a value indicating a Windows error code to be displayed in the dialog box. This only applies to Windows Vista or later, and only when <see cref="AutoUpgradeEnabled"/> is set to true.
+        /// Gets or sets a value indicating a Windows error code to be displayed in the dialog box. This only applies to Windows Vista or later, and only when <see cref="AutoUpgradeEnabled"/> is set to <see langword="true"/>.
         /// </summary>
         /// <value>The Windows error code for the corresponding error message to be formatted and displayed in the dialog box.</value>
         [Category("Behaviour")]
@@ -83,15 +89,15 @@ namespace NetEx.Windows.Forms
         /// <summary>
         /// Gets or sets a value indicating whether the dialog box should automatically upgrade appearance and behavior when running on Windows Vista or later.
         /// </summary>
-        /// <value>true if the dialog box should automatically upgrade appearance and behavior when running on Windows Vista or later; otherwise, false. The default is true.</value>
-        /// <remarks>If this property is false the dialog box will have a Windows XP-style appearance and behavior on Windows Vista. On Windows XP and Windows Server 2003 this property does not have any effect.</remarks>
+        /// <value><see langword="true"/> if the dialog box should automatically upgrade appearance and behavior when running on Windows Vista or later; otherwise, <see langword="false"/>. The default is <see langword="true"/>.</value>
+        /// <remarks>If this property is <see langword="false"/> the dialog box will have a Windows XP-style appearance and behavior on Windows Vista. On Windows XP and Windows Server 2003 this property does not have any effect.</remarks>
         [DefaultValue(true)]
         public bool AutoUpgradeEnabled { get; set; }
         /// <summary>
-        /// Gets or sets a value indicating the types of credentials that will be shown in the dialog box when running on Windows XP and Windows Server 2003, or when <see cref="AutoUpgradeEnabled"/> is set to false.
+        /// Gets or sets a value indicating the types of credentials that will be shown in the dialog box when running on Windows XP and Windows Server 2003, or when <see cref="AutoUpgradeEnabled"/> is set to <see langword="false"/>.
         /// </summary>
         /// <value>One of the <see cref="CredentialDialogCredentialFilter"/> values. The default value is <see cref="CredentialDialogCredentialFilter.AllCredentials"/>.</value>
-        /// <remarks>This property is only applicable on Windows XP and Windows Server 2003, or on later versions of Windows when using the dialog box with <see cref="AutoUpgradeEnabled"/> set to false.</remarks>
+        /// <remarks>This property is only applicable on Windows XP and Windows Server 2003, or on later versions of Windows when using the dialog box with <see cref="AutoUpgradeEnabled"/> set to <see langword="false"/>.</remarks>
         [Category("Behaviour")]
         [DefaultValue(CredentialDialogCredentialFilter.AllCredentials)]
         [Description("The types of credentials to display in the dialog.")]
@@ -106,34 +112,36 @@ namespace NetEx.Windows.Forms
         [Category("Data")]
         [DefaultValue("")]
         [Description("The domain entered in the dialog box.")]
+        [SuppressMessage("ReSharper", "UnusedMember.Global")]
         public string Domain
         {
             get => _domain;
             set
             {
-                if (value != null)
-                    if (value.Length > CREDUI_MAX_DOMAIN_TARGET_LENGTH)
-                        throw new ArgumentException($"The domain name has a maximum length of {CREDUI_MAX_DOMAIN_TARGET_LENGTH} characters.", nameof(value));
+                if (value.Length > CREDUI_MAX_DOMAIN_TARGET_LENGTH)
+                {
+                    throw new ArgumentException($"The domain name has a maximum length of {CREDUI_MAX_DOMAIN_TARGET_LENGTH} characters.", nameof(value));
+                }
 
                 _domain = value;
             }
         }
         /// <summary>
-        /// Gets or sets a value indicating whether the dialog box should prevent the user from changing the supplied username when running on Windows XP and Windows Server 2003, or when <see cref="AutoUpgradeEnabled"/> is set to false.
+        /// Gets or sets a value indicating whether the dialog box should prevent the user from changing the supplied username when running on Windows XP and Windows Server 2003, or when <see cref="AutoUpgradeEnabled"/> is set to <see langword="false"/>.
         /// </summary>
-        /// <value>true if the dialog box should prevent the user from changing the supplied username; otherwise, false. The default is true.</value>
-        /// <remarks>This property is only applicable on Windows XP and Windows Server 2003, or on later versions of Windows when using the dialog box with <see cref="AutoUpgradeEnabled"/> set to false.</remarks>
+        /// <value><see langword="true"/> if the dialog box should prevent the user from changing the supplied username; otherwise, <see langword="false"/>. The default is <see langword="true"/>.</value>
+        /// <remarks>This property is only applicable on Windows XP and Windows Server 2003, or on later versions of Windows when using the dialog box with <see cref="AutoUpgradeEnabled"/> set to <see langword="false"/>.</remarks>
         [Category("Behaviour")]
         [DefaultValue(false)]
         [Description("Controls whether the dialog box should prevent the user from changing the username.")]
         public bool DisableUsername { get; set; }
         /// <summary>
-        /// Gets or sets the image that is displayed in the dialog box when running on Windows XP and Windows Server 2003, or when <see cref="AutoUpgradeEnabled"/> is set to false.
+        /// Gets or sets the image that is displayed in the dialog box when running on Windows XP and Windows Server 2003, or when <see cref="AutoUpgradeEnabled"/> is set to <see langword="false"/>.
         /// </summary>
         /// <value>The <see cref="System.Drawing.Image"/> to display.</value>
         /// <remarks>
         /// If this member is NULL, a default bitmap is used. The bitmap size is limited to 320x60 pixels.
-        /// <para>This property is only applicable on Windows XP and Windows Server 2003, or on later versions of Windows when using the dialog box with <see cref="AutoUpgradeEnabled"/> set to false.</para>
+        /// <para>This property is only applicable on Windows XP and Windows Server 2003, or on later versions of Windows when using the dialog box with <see cref="AutoUpgradeEnabled"/> set to <see langword="false"/>.</para>
         /// </remarks>
         /// <exception cref="ArgumentException">
         /// <paramref name="value"/> does not have the correct height or width.
@@ -141,7 +149,8 @@ namespace NetEx.Windows.Forms
         [Category("Appearance")]
         [DefaultValue(null)]
         [Description("The image to display in the dialog.")]
-        public Image Image
+        [SuppressMessage("ReSharper", "UnusedMember.Global")]
+        public Image? Image
         {
             get => _image;
             set
@@ -149,20 +158,24 @@ namespace NetEx.Windows.Forms
                 if (value != null)
                 {
                     if (value.Height != CREDUI_BANNER_HEIGHT)
+                    {
                         throw new ArgumentException($"The banner image height must be {CREDUI_BANNER_HEIGHT} pixels.", nameof(value));
+                    }
 
                     if (value.Width != CREDUI_BANNER_WIDTH)
+                    {
                         throw new ArgumentException($"The banner image width must be {CREDUI_BANNER_WIDTH} pixels.", nameof(value));
+                    }
                 }
 
                 _image = value;
             }
         }
         /// <summary>
-        /// Gets or sets a value indicating whether the dialog box should automatically notify the user of insufficient credentials by displaying the "Logon unsuccessful" balloon tip. This only applies when running on Windows XP and Windows Server 2003, or when <see cref="AutoUpgradeEnabled"/> is set to false.
+        /// Gets or sets a value indicating whether the dialog box should automatically notify the user of insufficient credentials by displaying the "Logon unsuccessful" balloon tip. This only applies when running on Windows XP and Windows Server 2003, or when <see cref="AutoUpgradeEnabled"/> is set to <see langword="false"/>.
         /// </summary>
-        /// <value>true if the dialog box should automatically notify the user of insufficient credentials by displaying the "Logon unsuccessful" balloon tip; otherwise, false. The default is false.</value>
-        /// <remarks>This property is only applicable on Windows XP and Windows Server 2003, or on later versions of Windows when using the dialog box with <see cref="AutoUpgradeEnabled"/> set to false.</remarks>
+        /// <value><see langword="true"/> if the dialog box should automatically notify the user of insufficient credentials by displaying the "Logon unsuccessful" balloon tip; otherwise, <see langword="false"/>. The default is <see langword="false"/>.</value>
+        /// <remarks>This property is only applicable on Windows XP and Windows Server 2003, or on later versions of Windows when using the dialog box with <see cref="AutoUpgradeEnabled"/> set to <see langword="false"/>.</remarks>
         [Category("Behaviour")]
         [DefaultValue(false)]
         [Description("Controls whether the dialog box should automatically notify the user of insufficient credentials by displaying the \"Logon unsuccessful\" balloon tip.")]
@@ -202,39 +215,37 @@ namespace NetEx.Windows.Forms
         [DefaultValue(null)]
         [Description("The password entered in the dialog box.")]
         [SuppressMessage("ReSharper", "UnusedMember.Global")]
-        public SecureString Password
+        public SecureString? Password
         {
             get => _password;
             set
             {
-                if (value != null)
-                    if (value.Length > CREDUI_MAX_PASSWORD_LENGTH)
-                        throw new ArgumentException($"The password has a maximum length of {CREDUI_MAX_PASSWORD_LENGTH} characters.", nameof(value));
+                if (value is { Length: > CREDUI_MAX_PASSWORD_LENGTH })
+                {
+                    throw new ArgumentException($"The password has a maximum length of {CREDUI_MAX_PASSWORD_LENGTH} characters.", nameof(value));
+                }
 
                 _password = value;
             }
         }
 #if DEBUG
         /// <summary>
-        /// Gets a <see cref="String"/> containing the password entered in the dialog box.
+        /// Gets a <see cref="string"/> containing the password entered in the dialog box.
         /// </summary>
-        /// <value>The value of <see cref="Password"/> converted to a <see cref="String"/>.</value>
-        /// <remarks>This method is provided for debugging purposes only, and is only included in debug builds.</remarks>
+        /// <value>The value of <see cref="Password"/> converted to a <see cref="string"/>.</value>
+        /// <remarks>This property is provided for debugging purposes only, and is only included in debug builds.</remarks>
         [Category("Data")]
-        [Description("The password entered in the dialog box.")]
-        //[SuppressMessage("Microsoft.Security", "CA2122:DoNotIndirectlyExposeMethodsWithLinkDemands")]
+        [Description("The password entered in the dialog box. This property is provided for debugging purposes only, and is only included in debug builds.")]
+        [SuppressMessage("ReSharper", "UnusedMember.Global")]
         public string PasswordString
         {
             get
             {
-                if (_password == null)
-                    return string.Empty;
-
                 var unmanagedPasswordPointer = IntPtr.Zero;
                 try
                 {
-                    unmanagedPasswordPointer = Marshal.SecureStringToGlobalAllocUnicode(_password);
-                    return Marshal.PtrToStringUni(unmanagedPasswordPointer);
+                    unmanagedPasswordPointer = Marshal.SecureStringToGlobalAllocUnicode(_password ?? new());
+                    return Marshal.PtrToStringUni(unmanagedPasswordPointer) ?? string.Empty;
                 }
                 finally
                 {
@@ -246,7 +257,7 @@ namespace NetEx.Windows.Forms
         /// <summary>
         /// Gets or sets a value indicating whether the save check box is selected.
         /// </summary>
-        /// <value>true if the save check box is selected; otherwise, false. The default value is false.</value>
+        /// <value><see langword="true"/> if the save check box is selected; otherwise, <see langword="false"/>. The default value is <see langword="false"/>.</value>
         /// <remarks>The <see cref="ShowSave"/> property must be set before in order for the save check box to appear in the dialog box.</remarks>
         [Category("Behaviour")]
         [DefaultValue(false)]
@@ -260,7 +271,7 @@ namespace NetEx.Windows.Forms
         /// <summary>
         /// Gets or sets a value indicating whether the dialog box contains a save check box.
         /// </summary>
-        /// <value>true if the dialog box contains a save check box; otherwise, false. The default value is true.</value>
+        /// <value><see langword="true"/> if the dialog box contains a save check box; otherwise, <see langword="false"/>. The default value is <see langword="true"/>.</value>
         [Category("Appearance")]
         [DefaultValue(true)]
         [Description("Controls whether to show the save check box in the dialog.")]
@@ -275,15 +286,16 @@ namespace NetEx.Windows.Forms
         [Category("Appearance")]
         [DefaultValue("")]
         [Description("The string to display in the title bar of the dialog box.")]
-        //[SuppressMessage("ReSharper", "UnusedMember.Global")]
+        [SuppressMessage("ReSharper", "UnusedMember.Global")]
         public string Title
         {
             get => _title;
             set
             {
-                if (value != null)
-                    if (value.Length > CREDUI_MAX_CAPTION_LENGTH)
-                        throw new ArgumentException($"The caption has a maximum length of {CREDUI_MAX_CAPTION_LENGTH} characters.", nameof(value));
+                if (value.Length > CREDUI_MAX_CAPTION_LENGTH)
+                {
+                    throw new ArgumentException($"The caption has a maximum length of {CREDUI_MAX_CAPTION_LENGTH} characters.", nameof(value));
+                }
 
                 _title = value;
             }
@@ -303,9 +315,10 @@ namespace NetEx.Windows.Forms
             get => _username;
             set
             {
-                if (value != null)
-                    if (value.Length > CREDUI_MAX_USERNAME_LENGTH)
-                        throw new ArgumentException($"The user name has a maximum length of {CREDUI_MAX_USERNAME_LENGTH} characters.", nameof(value));
+                if (value is { Length: > CREDUI_MAX_USERNAME_LENGTH })
+                {
+                    throw new ArgumentException($"The user name has a maximum length of {CREDUI_MAX_USERNAME_LENGTH} characters.", nameof(value));
+                }
 
                 _username = value;
             }
@@ -319,8 +332,8 @@ namespace NetEx.Windows.Forms
 
         private void ConvertUnmanagedPasswordToSecureString(IntPtr unmanagedPasswordPointer)
         {
-            // Clear our password field and create a new SecureString instance
-            _password = new SecureString();
+            // Create a new SecureString to store the parsed password in.
+            var newPassword = new SecureString();
 
             // Indicate that the following block contains unsafe code
             unsafe
@@ -335,10 +348,12 @@ namespace NetEx.Windows.Forms
                         // If the current char is a null-character then we have reached the end
                         // of the string in memory so break out of the loop
                         if (managedPasswordCharacters[x] == '\0')
+                        {
                             break;
+                        }
 
                         // Append the current char to the password SecureString
-                        _password.AppendChar(managedPasswordCharacters[x]);
+                        newPassword.AppendChar(managedPasswordCharacters[x]);
 
                         // Zero the memory where the current char was stored for additional security
                         managedPasswordCharacters[x] = '0';
@@ -348,7 +363,11 @@ namespace NetEx.Windows.Forms
 
             // Make the password SecureString readonly to prevent tampering and provide
             // additional security
-            _password.MakeReadOnly();
+            newPassword.MakeReadOnly();
+
+            // Dispose of the previous password object, and set the password to our newly parsed password.
+            _password?.Dispose();
+            _password = newPassword;
         }
         private void ParseUsername(StringBuilder username)
         {
@@ -383,15 +402,21 @@ namespace NetEx.Windows.Forms
 
             // Set the flag to determine whether to show the "Incorrect Password" prompt to the user
             if (IncorrectPasswordPrompt)
+            {
                 flags |= CREDUI_FLAGS.CREDUI_FLAGS_INCORRECT_PASSWORD;
+            }
 
             // Set the flag to determine whether the "Save Password" checkbox is shown
             if (ShowSave)
+            {
                 flags |= CREDUI_FLAGS.CREDUI_FLAGS_SHOW_SAVE_CHECK_BOX;
+            }
 
             // Set the flag to determine whether the username within the dialog is read-only
             if (DisableUsername)
+            {
                 flags |= CREDUI_FLAGS.CREDUI_FLAGS_KEEP_USERNAME;
+            }
 
             // Switch based on our CredentialFilter enum and set the flag to display only the
             // usernames requested by the user
@@ -417,7 +442,7 @@ namespace NetEx.Windows.Forms
 
             // Marshal the password from a SecureString into memory and get a pointer that we can
             // pass to the credential dialog API
-            var unmanagedPasswordPointer = Marshal.SecureStringToGlobalAllocUnicode(_password);
+            var unmanagedPasswordPointer = Marshal.SecureStringToGlobalAllocUnicode(_password ?? new());
 
             try
             {
@@ -451,15 +476,15 @@ namespace NetEx.Windows.Forms
 
             // Set the flag to determine whether the "Save Password" checkbox is shown.
             if (ShowSave)
-                flags = flags | CREDUIWIN.CREDUIWIN_CHECKBOX;
-
-            // Switch based on our CredentialFilter enum and set the flag to display only the
-            // usernames requested by the user.
-            switch (CredentialFilter)
             {
-                case CredentialDialogCredentialFilter.AdministratorsOnly:
-                    flags = flags | CREDUIWIN.CREDUIWIN_ENUMERATE_ADMINS;
-                    break;
+                flags |= CREDUIWIN.CREDUIWIN_CHECKBOX;
+            }
+
+            // Check the value of our CredentialFilter enum and set the flag to display only the
+            // usernames requested by the user.
+            if (CredentialFilter == CredentialDialogCredentialFilter.AdministratorsOnly)
+            {
+                flags |= CREDUIWIN.CREDUIWIN_ENUMERATE_ADMINS;
             }
 
             // A variable for storing the result code from showing the dialog.
@@ -467,13 +492,13 @@ namespace NetEx.Windows.Forms
 
             // Create a pointer to the packed credential object we will pass to the dialog, along
             // with it's maximum size.
-            var packedInputcredential = IntPtr.Zero;
-            var packedInputcredentialSize = 128;
+            var packedInputCredential = IntPtr.Zero;
+            var packedInputCredentialSize = 128;
 
             // Create a pointer to the packed credential object we will receive from the dialog, along
             // with an Int32 to store the object size.
-            IntPtr packedOutputcredential;
-            int packedOutputcredentialSize;
+            IntPtr packedOutputCredential;
+            int packedOutputCredentialSize;
 
             // Specify which authentication package we will use with the dialog. This functionality is
             // unsupported.
@@ -481,46 +506,54 @@ namespace NetEx.Windows.Forms
 
             // Marshal the password from a SecureString into memory and get a pointer that we can
             // pass to the credential dialog API.
-            var unmanagedPasswordPointer = Marshal.SecureStringToGlobalAllocUnicode(_password);
+            var unmanagedPasswordPointer = Marshal.SecureStringToGlobalAllocUnicode(_password ?? new());
 
             // Get the username that we will pass to the dialog - this object will also get the
             // returned username and domain.
             var username = new StringBuilder(_username) { Capacity = CREDUI_MAX_USERNAME_LENGTH };
 
             // If the user has also specified a domain then insert that into the username.
-            if (!string.IsNullOrEmpty(_domain))
+#if NET40_OR_GREATER || NET
+            if (!string.IsNullOrWhiteSpace(_domain))
+#else
+            if (!string.IsNullOrEmpty(_domain.Trim()))
+#endif
+            {
                 username.Insert(0, _domain + "\\");
+            }
 
             try
             {
                 // Allocate memory for our packed credential
-                packedInputcredential = Marshal.AllocCoTaskMem(packedInputcredentialSize);
+                packedInputCredential = Marshal.AllocCoTaskMem(packedInputCredentialSize);
 
-                // Attempt to pack the credential. If this fails, it can often be bceause the buffer
+                // Attempt to pack the credential. If this fails, it can often be because the buffer
                 // size provided is too small. If the buffer is not of sufficient size, then
                 // 'packedInputCredentialSize' will be set to the required size, in bytes, of the
                 // packed credentials.
-                if (!NativeMethods.CredPackAuthenticationBuffer(0, username, unmanagedPasswordPointer, packedInputcredential, ref packedInputcredentialSize))
+                if (!NativeMethods.CredPackAuthenticationBuffer(0, username, unmanagedPasswordPointer, packedInputCredential, ref packedInputCredentialSize))
                 {
                     // If the attempt to pack the credentials failed it was probably due to
                     // buffer size, so we attempt the operation again using the size specified
                     // during the previous attempt.
 
                     // Firstly we free the memory previously allocated as it is of the incorrect size.
-                    Marshal.FreeCoTaskMem(packedInputcredential);
+                    Marshal.FreeCoTaskMem(packedInputCredential);
 
                     // Now we allocate memory for our packed credential.
-                    packedInputcredential = Marshal.AllocCoTaskMem(packedInputcredentialSize);
+                    packedInputCredential = Marshal.AllocCoTaskMem(packedInputCredentialSize);
 
                     // Now we attempt to pack the credential again. If it fails this time then it is
                     // for some other reason, so we return the Win32 error (as this is what RunDialog
                     // expects).
-                    if (!NativeMethods.CredPackAuthenticationBuffer(0, username, unmanagedPasswordPointer, packedInputcredential, ref packedInputcredentialSize))
+                    if (!NativeMethods.CredPackAuthenticationBuffer(0, username, unmanagedPasswordPointer, packedInputCredential, ref packedInputCredentialSize))
+                    {
                         return Marshal.GetLastWin32Error();
+                    }
                 }
 
                 // Display the dialog box using the previously packed credentials.
-                resultCode = NativeMethods.CredUIPromptForWindowsCredentials(ref credUiInfo, AuthenticationError, ref authenticationPackage, packedInputcredential, packedInputcredentialSize, out packedOutputcredential, out packedOutputcredentialSize, ref _saveChecked, flags);
+                resultCode = NativeMethods.CredUIPromptForWindowsCredentials(ref credUiInfo, AuthenticationError, ref authenticationPackage, packedInputCredential, packedInputCredentialSize, out packedOutputCredential, out packedOutputCredentialSize, ref _saveChecked, flags);
             }
             finally
             {
@@ -528,12 +561,7 @@ namespace NetEx.Windows.Forms
                 Marshal.ZeroFreeGlobalAllocUnicode(unmanagedPasswordPointer);
 
                 // Free the memory allocated to the packed credential we passed to the dialog.
-                Marshal.FreeCoTaskMem(packedInputcredential);
-
-                // Dispose te password object to clean it up - we will create a new one when we
-                // unpack the credentials the dialog returns to us.
-                _password.Dispose();
-                _password = null;
+                Marshal.FreeCoTaskMem(packedInputCredential);
             }
 
             try
@@ -551,8 +579,10 @@ namespace NetEx.Windows.Forms
                     try
                     {
                         // Try and unpack the packed credential we received from the dialog.
-                        if (!NativeMethods.CredUnPackAuthenticationBuffer(1, packedOutputcredential, packedOutputcredentialSize, username, ref unpackedUsernameBufferSize, internalDomain, ref unpackedDomainBufferSize, unmanagedPasswordPointer, ref unpackedPasswordBufferSize))
+                        if (!NativeMethods.CredUnPackAuthenticationBuffer(1, packedOutputCredential, packedOutputCredentialSize, username, ref unpackedUsernameBufferSize, internalDomain, ref unpackedDomainBufferSize, unmanagedPasswordPointer, ref unpackedPasswordBufferSize))
+                        {
                             return Marshal.GetLastWin32Error(); // Return the Win32 error the dialog returned - this is expected by DialogBase.
+                        }
                         else
                         {
                             // The credential was successfully unpacked so we can now call our methods
@@ -579,51 +609,67 @@ namespace NetEx.Windows.Forms
             finally
             {
                 // Free the memory allocated to the packed credential we received from the dialog.
-                Marshal.FreeCoTaskMem(packedOutputcredential);
+                Marshal.FreeCoTaskMem(packedOutputCredential);
             }
         }
-        [SuppressMessage("ReSharper", "MemberCanBeMadeStatic.Local")]
         private bool UseVistaDialogInternal()
         {
             // This code is based on the FileDialog class, included as part of the .Net Framework
 
             // Check that we are running on Windows NT
             if (Environment.OSVersion.Platform != PlatformID.Win32NT)
+            {
                 return false;
+            }
 
             // Check that we are running on Windows Vista or later
             if (Environment.OSVersion.Version < new Version(6, 0)) // Vista identifies as Windows version 6.0
+            {
                 return false;
+            }
 
             // If we are on Vista or later check whether the user has chosen to use the newer credential dialog
             if (!AutoUpgradeEnabled)
+            {
                 return false;
+            }
+
+#if NETFRAMEWORK
+            // Code access security (CAS) is an unsupported, legacy technology. The infrastructure to enable CAS, which exists only
+            // in .NET Framework 2.x - 4.x, is deprecated and not receiving servicing or security fixes.
 
             // Assert EnvironmentPermission in order to determine the system BootMode
             new EnvironmentPermission(PermissionState.Unrestricted).Assert();
 
             try
             {
+#endif
                 // If we are running on Vista or later, check that we are running in normal boot mode,
                 // and not any other mode (e.g., Safe Mode)
                 return SystemInformation.BootMode == BootMode.Normal;
+#if NETFRAMEWORK
             }
             finally
             {
+                // Code access security (CAS) is an unsupported, legacy technology. The infrastructure to enable CAS, which exists only
+                // in .NET Framework 2.x - 4.x, is deprecated and not receiving servicing or security fixes.
+
                 // Revert our previously asserted access permission
                 CodeAccessPermission.RevertAssert();
             }
+#endif
         }
 
-        #endregion
+#endregion
 
         #region Protected
 
+        /// <inheritdoc/>
         protected override void Dispose(bool disposing)
         {
             if (disposing)
             {
-                if (Image != null)
+                if (_image != null)
                 {
                     _image.Dispose();
                     _image = null;
@@ -638,15 +684,20 @@ namespace NetEx.Windows.Forms
 
             base.Dispose(disposing);
         }
+        /// <inheritdoc/>
         protected override bool RunDialog(IntPtr hwndOwner)
         {
             // Check we are on at least Windows XP/Server 2003 as the Credential APIs require it
             if (Environment.OSVersion.Version.Major < 5)
+            {
                 throw new PlatformNotSupportedException("The Credential Management API requires Windows XP/Windows Server 2003 or higher.");
+            }
 
             // Check for illegal cross thread calls
             if (Control.CheckForIllegalCrossThreadCalls && Application.OleRequired() != 0)
+            {
                 throw new ThreadStateException("Current thread must be set to single thread apartment(STA) mode before OLE calls can be made. Ensure that your Main function has STAThreadAttribute marked on it. This exception is only raised if a debugger is attached to the process.");
+            }
 
             // Create our CREDUI_INFO object, which will be used by either the new or old dialog
             var credUiInfo = new CREDUI_INFO
@@ -660,18 +711,15 @@ namespace NetEx.Windows.Forms
             // one and we are using the classic dialog,
             var gdiBitmap = IntPtr.Zero;
             if (_image != null && !UseVistaDialogInternal())
+            {
                 gdiBitmap = ((Bitmap)_image).GetHbitmap();
+            }
 
             // Add the image to the CREDUI_INFO object
             credUiInfo.hbmBanner = gdiBitmap;
 
             // Update the size of the CREDUI_INFO object
             credUiInfo.cbSize = Marshal.SizeOf(credUiInfo);
-
-            // We need a secure string to store the password in so if the user has specified
-            // null we can just create a new, empty SecureString
-            if (_password == null)
-                _password = new SecureString();
 
             try
             {
@@ -695,18 +743,19 @@ namespace NetEx.Windows.Forms
             {
                 // If an image was used free the memory used by the GDI bitmap object
                 if (gdiBitmap != IntPtr.Zero)
+                {
                     NativeMethods.DeleteObject(gdiBitmap);
+                }
             }
         }
 
-        #endregion 
+        #endregion
 
         #region Public
 
         /// <summary>
         /// Resets properties to their default values.
         /// </summary>
-        [SuppressMessage("ReSharper", "InheritdocConsiderUsage")]
         public override void Reset()
         {
             // All configurable properties have a DefaultValueAttribute associated
@@ -716,7 +765,9 @@ namespace NetEx.Windows.Forms
             {
                 var dvList = property.GetCustomAttributes(typeof(DefaultValueAttribute), true);
                 if (dvList.Length > 0 && dvList[0] is DefaultValueAttribute attribute)
+                {
                     property.SetValue(this, attribute.Value, null);
+                }
             }
         }
 

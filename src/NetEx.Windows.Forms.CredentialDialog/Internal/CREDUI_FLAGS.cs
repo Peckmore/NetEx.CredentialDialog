@@ -8,10 +8,10 @@ namespace NetEx.Windows.Forms.Internal
     /// </summary>
     /// <seealso href="https://docs.microsoft.com/en-gb/windows/desktop/api/wincred/nf-wincred-creduipromptforcredentialsw"/>
     [Flags]
+    [SuppressMessage("ReSharper", "CommentTypo")]
+    [SuppressMessage("ReSharper", "IdentifierTypo")]
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
-    // ReSharper disable CommentTypo
-    // ReSharper disable IdentifierTypo
     internal enum CREDUI_FLAGS
     {
         /// <summary>
@@ -83,6 +83,4 @@ namespace NetEx.Windows.Forms.Internal
         /// </summary>
         CREDUI_FLAGS_VALIDATE_USERNAME = 0x00400,
     }
-    // ReSharper restore CommentTypo
-    // ReSharper restore IdentifierTypo
 }

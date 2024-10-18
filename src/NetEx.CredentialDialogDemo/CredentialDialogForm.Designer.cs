@@ -1,4 +1,7 @@
-﻿namespace NetEx.CredentialDialogDemo
+﻿using System.Drawing;
+using System.Windows.Forms;
+
+namespace NetEx.CredentialDialogDemo
 {
     partial class CredentialDialogForm
     {
@@ -28,20 +31,23 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.promptButton = new System.Windows.Forms.Button();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CredentialDialogForm));
+            this.showDialogButton = new System.Windows.Forms.Button();
             this.credentialDialogPropertyGrid = new System.Windows.Forms.PropertyGrid();
             this.credentialDialog = new NetEx.Windows.Forms.CredentialDialog();
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.frameworkToolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
-            // promptButton
+            // showDialogButton
             // 
-            this.promptButton.Location = new System.Drawing.Point(12, 12);
-            this.promptButton.Name = "promptButton";
-            this.promptButton.Size = new System.Drawing.Size(75, 23);
-            this.promptButton.TabIndex = 2;
-            this.promptButton.Text = "Prompt";
-            this.promptButton.UseVisualStyleBackColor = true;
-            this.promptButton.Click += new System.EventHandler(this.PromptButton_Click);
+            this.showDialogButton.Location = new System.Drawing.Point(12, 12);
+            this.showDialogButton.Name = "showDialogButton";
+            this.showDialogButton.Size = new System.Drawing.Size(75, 23);
+            this.showDialogButton.TabIndex = 2;
+            this.showDialogButton.Text = "Show Dialog";
+            this.showDialogButton.UseVisualStyleBackColor = true;
             // 
             // credentialDialogPropertyGrid
             // 
@@ -50,27 +56,50 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.credentialDialogPropertyGrid.Location = new System.Drawing.Point(12, 41);
             this.credentialDialogPropertyGrid.Name = "credentialDialogPropertyGrid";
-            this.credentialDialogPropertyGrid.Size = new System.Drawing.Size(314, 470);
+            this.credentialDialogPropertyGrid.Size = new System.Drawing.Size(314, 449);
             this.credentialDialogPropertyGrid.TabIndex = 4;
+            // 
+            // statusStrip1
+            // 
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.frameworkToolStripStatusLabel});
+            this.statusStrip1.Location = new System.Drawing.Point(0, 501);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(338, 22);
+            this.statusStrip1.TabIndex = 5;
+            this.statusStrip1.Text = "statusStrip1";
+            // 
+            // frameworkToolStripStatusLabel
+            // 
+            this.frameworkToolStripStatusLabel.Name = "frameworkToolStripStatusLabel";
+            this.frameworkToolStripStatusLabel.Size = new System.Drawing.Size(118, 17);
+            this.frameworkToolStripStatusLabel.Text = "toolStripStatusLabel1";
             // 
             // CredentialDialogForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(338, 523);
+            this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.credentialDialogPropertyGrid);
-            this.Controls.Add(this.promptButton);
+            this.Controls.Add(this.showDialogButton);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "CredentialDialogForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Credential Dialog Demo";
+            this.statusStrip1.ResumeLayout(false);
+            this.statusStrip1.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
         #endregion
 
-        private Button promptButton;
+        private Button showDialogButton;
         private PropertyGrid credentialDialogPropertyGrid;
         private NetEx.Windows.Forms.CredentialDialog credentialDialog;
+        private StatusStrip statusStrip1;
+        private ToolStripStatusLabel frameworkToolStripStatusLabel;
     }
 }

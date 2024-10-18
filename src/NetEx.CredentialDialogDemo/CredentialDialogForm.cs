@@ -1,4 +1,6 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Windows.Forms;
 
 namespace NetEx.CredentialDialogDemo
 {
@@ -6,28 +8,34 @@ namespace NetEx.CredentialDialogDemo
     {
         #region Construction
 
+        [SuppressMessage("ReSharper", "LocalizableElement")]
         public CredentialDialogForm()
         {
             InitializeComponent();
+
             credentialDialogPropertyGrid.SelectedObject = credentialDialog;
+#if NET20
+            frameworkToolStripStatusLabel.Text = ".Net Framework 2.0";
+#elif NET8_0
+            frameworkToolStripStatusLabel.Text = ".Net 8.0";
+#endif
         }
 
         #endregion
 
         #region Methods
 
-        //[SuppressMessage("Microsoft.Globalization", "CA1300:SpecifyMessageBoxOptions")]
-        //[SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", MessageId = "System.Windows.Forms.MessageBox.Show(System.String)")]
-        //[SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "SecureString")]
         [SuppressMessage("ReSharper", "LocalizableElement")]
-        private void PromptButton_Click(object sender, EventArgs e)
+        private void showDialogButton_Click(object sender, EventArgs e)
         {
             if (credentialDialog.ShowDialog() == DialogResult.OK)
+            {
 #if DEBUG
                 MessageBox.Show("Domain:\t" + credentialDialog.Domain + "\nUser:\t" + credentialDialog.Username + "\nPassword:\t" + credentialDialog.PasswordString);
 #else
                 MessageBox.Show("Domain:\t" + credentialDialog.Domain + "\nUser:\t" + credentialDialog.Username + "\nPassword is a SecureString and cannot be displayed without converting to a String.");
 #endif
+            }
 
             // Refresh the property grid
             credentialDialogPropertyGrid.Refresh();

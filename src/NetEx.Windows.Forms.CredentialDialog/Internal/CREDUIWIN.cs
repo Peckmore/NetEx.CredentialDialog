@@ -8,6 +8,8 @@ namespace NetEx.Windows.Forms.Internal
     /// </summary>
     /// <seealso href="https://docs.microsoft.com/en-gb/windows/desktop/api/wincred/nf-wincred-creduipromptforwindowscredentialsw"/>
     [Flags]
+    [SuppressMessage("ReSharper", "CommentTypo")]
+    [SuppressMessage("ReSharper", "IdentifierTypo")]
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
     internal enum CREDUIWIN

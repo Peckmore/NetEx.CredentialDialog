@@ -1,10 +1,12 @@
 ﻿using NetEx.Windows.Forms.Internal;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Text;
 
 namespace NetEx.Windows.Forms
 {
+    [SuppressMessage("ReSharper", "IdentifierTypo")]
     internal static class NativeMethods
     {
         [DllImport("credui.dll", CharSet = CharSet.Unicode, SetLastError = true)]
@@ -16,7 +18,7 @@ namespace NetEx.Windows.Forms
         [DllImport("credui.dll", CharSet = CharSet.Unicode, SetLastError = true, EntryPoint = "CredUIPromptForWindowsCredentialsW")]
         public static extern int CredUIPromptForWindowsCredentials(ref CREDUI_INFO pUiInfo, int dwAuthError, ref uint pulAuthPackage, IntPtr pvInAuthBuffer, int ulInAuthBufferSize, out IntPtr ppvOutAuthBuffer, out int pulOutAuthBufferSize, ref bool pfSave, CREDUIWIN dwFlags);
         [DllImport("credui.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-        public static extern bool CredUnPackAuthenticationBuffer(int dwFlags, IntPtr pAuthBuffer, int cbAuthBuffer, StringBuilder pszUserName, ref int pcchMaxUserName, StringBuilder pszDomainName, ref int pcchMaxDomainame, IntPtr pszPassword, ref int pcchMaxPassword);
+        public static extern bool CredUnPackAuthenticationBuffer(int dwFlags, IntPtr pAuthBuffer, int cbAuthBuffer, StringBuilder pszUserName, ref int pcchMaxUserName, StringBuilder pszDomainName, ref int pcchMaxDomainName, IntPtr pszPassword, ref int pcchMaxPassword);
         [DllImport("gdi32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         public static extern bool DeleteObject(IntPtr hObject);
     }
