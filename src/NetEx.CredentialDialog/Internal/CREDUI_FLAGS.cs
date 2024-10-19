@@ -1,7 +1,6 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 
-namespace NetEx.Windows.Forms.Internal
+namespace System.Windows.Forms.Internal
 {
     /// <summary>
     /// Flags that control the operation of a credential dialog box called using CredUIPromptForCredentials.

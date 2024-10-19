@@ -1,5 +1,4 @@
-﻿using System.Drawing;
-using System.Windows.Forms;
+﻿using System.Windows.Forms;
 
 namespace NetEx.CredentialDialogDemo
 {
@@ -34,7 +33,7 @@ namespace NetEx.CredentialDialogDemo
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CredentialDialogForm));
             this.showDialogButton = new System.Windows.Forms.Button();
             this.credentialDialogPropertyGrid = new System.Windows.Forms.PropertyGrid();
-            this.credentialDialog = new NetEx.Windows.Forms.CredentialDialog();
+            this.credentialDialog = new System.Windows.Forms.CredentialDialog();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.frameworkToolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.statusStrip1.SuspendLayout();
@@ -99,7 +98,7 @@ namespace NetEx.CredentialDialogDemo
 
         private Button showDialogButton;
         private PropertyGrid credentialDialogPropertyGrid;
-        private NetEx.Windows.Forms.CredentialDialog credentialDialog;
+        private System.Windows.Forms.CredentialDialog credentialDialog;
         private StatusStrip statusStrip1;
         private ToolStripStatusLabel frameworkToolStripStatusLabel;
     }
